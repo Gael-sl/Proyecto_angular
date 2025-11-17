@@ -1,0 +1,207 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <section class="bg-white border-b border-gray-200 py-12">
+    <div class="container-custom">
+      <h1 class="font-playfair text-center mb-4">Mis Reservas</h1>
+      <div class="divider"></div>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="section-padding">
+    <div class="container-custom">
+      
+      @if (loading()) {
+        <app-loading-spinner [size]="300" message="Cargando reservas..."></app-loading-spinner>
+      }
+
+      @if (error()) {
+        <div class="error-message text-center">
+          {{ error() }}
+        </div>
+      }
+
+      @if (!loading() && reservations().length === 0) {
+        <div class="text-center py-16">
+          <p class="text-gray-600 text-lg mb-6">No tienes reservas aún</p>
+          <a routerLink="/catalog" class="btn-primary">Explorar Catálogo</a>
+        </div>
+      }
+
+      <div class="space-y-6">
+        @for (reservation of reservations(); track reservation.id) {
+          <div class="card">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              
+              <!-- Car Image -->
+              <div class="lg:col-span-1">
+                @if (reservation.car?.image) {
+                     <img [src]="reservation.car?.image" [alt]="reservation.car?.brand" 
+                       class="w-full aspect-video object-cover" />
+                } @else {
+                  <div class="w-full aspect-video bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-400">Sin imagen</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Reservation Info -->
+              <div class="lg:col-span-2 space-y-4">
+                <div>
+                  <div class="flex items-center gap-3 mb-2">
+                    <h3 class="font-playfair">
+                      {{ reservation.car?.brand }} {{ reservation.car?.model }}
+                    </h3>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(reservation.status)">
+                      {{ getStatusLabel(reservation.status) }}
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-600">Reserva #{{ reservation.id }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p class="text-gray-600">Inicio</p>
+                    <p class="font-semibold">{{ reservation.startDate }}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Devolución</p>
+                    <p class="font-semibold">{{ reservation.endDate }}</p>
+                    @if (reservation.isEarlyReturn) {
+                      <p class="text-xs text-green-600">Devolución anticipada</p>
+                    }
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Plan</p>
+                    <p class="font-semibold">{{ reservation.plan }}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">Total días</p>
+                    <p class="font-semibold">{{ reservation.totalDays }}</p>
+                  </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <p class="text-sm text-gray-600">Total</p>
+                      <p class="text-2xl font-playfair">${{ reservation.totalAmount.toFixed(2) }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs text-gray-600">
+                        Anticipo: {{ reservation.depositPaid ? '✓ Pagado' : 'Pendiente' }}
+                      </p>
+                      <p class="text-xs text-gray-600">
+                        Total: {{ reservation.finalPaid ? '✓ Pagado' : 'Pendiente' }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Extras -->
+                @if (reservation.extras && reservation.extras.length > 0) {
+                  <div class="text-xs">
+                    <p class="text-gray-600 mb-1">Extras:</p>
+                    <p>{{ extrasList(reservation.extras) }}</p>
+                  </div>
+                }
+
+                <!-- Days Remaining (for active reservations) -->
+                @if (reservation.status === 'activa') {
+                  <div class="bg-black text-white p-3 text-sm">
+                    <p class="font-semibold">
+                      📍 Renta Activa - {{ calculateDaysRemaining(reservation.endDate) }} día(s) restante(s)
+                    </p>
+                  </div>
+                }
+              </div>
+
+              <!-- Actions -->
+              <div class="lg:col-span-1 flex flex-col gap-2">
+                
+                @if (canPickup(reservation)) {
+                  <a [routerLink]="['/checklist-pickup', reservation.id]" class="btn-primary text-center text-xs py-2">
+                    Recoger Vehículo
+                  </a>
+                }
+
+                @if (canReturn(reservation)) {
+                  <a [routerLink]="['/checklist-return', reservation.id]" class="btn-primary text-center text-xs py-2">
+                    Devolver Vehículo
+                  </a>
+                }
+
+                @if (canRate(reservation)) {
+                  <a [routerLink]="['/rating', reservation.id]" class="btn-secondary text-center text-xs py-2">
+                    Calificar Servicio
+                  </a>
+                }
+
+                <!-- NUEVA FEATURE: Botón Devolución Anticipada -->
+                @if (reservation.status === 'activa' && !reservation.isEarlyReturn) {
+                  <button (click)="openEarlyReturnModal(reservation)" class="btn-ghost text-xs py-2">
+                    Devolver Antes
+                  </button>
+                }
+
+                <a [routerLink]="['/car', reservation.carId]" class="btn-ghost text-xs py-2 text-center">
+                  Ver Vehículo
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL: Early Return -->
+@if (showEarlyReturnModal()) {
+  <div class="overlay" (click)="closeEarlyReturnModal()">
+    <div class="modal p-8" (click)="$event.stopPropagation()">
+      <h2 class="font-playfair mb-6">Devolución Anticipada</h2>
+      
+      <p class="text-gray-600 mb-6">
+        Si devuelves el vehículo antes de la fecha programada, se ajustará el precio y recibirás un reembolso proporcional.
+      </p>
+
+      <div class="space-y-4 mb-6">
+        <div>
+          <label for="earlyDate">Nueva Fecha de Devolución</label>
+            <input
+            type="date"
+            id="earlyDate"
+            [(ngModel)]="earlyReturnDate"
+            [max]="selectedReservation?.endDate"
+            [min]="minDate"
+          />
+        </div>
+
+        <div>
+          <label for="reason">Motivo (opcional)</label>
+          <textarea
+            id="reason"
+            [(ngModel)]="earlyReturnReason"
+            rows="3"
+            placeholder="¿Por qué necesitas devolver antes?"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button (click)="closeEarlyReturnModal()" class="btn-secondary flex-1">
+          Cancelar
+        </button>
+        <button (click)="confirmEarlyReturn()" class="btn-primary flex-1">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-footer></app-footer>

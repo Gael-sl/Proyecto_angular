@@ -1,0 +1,117 @@
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+  <div class="container-custom">
+    <div class="flex items-center justify-between h-20">
+      
+      <!-- Logo -->
+      <a routerLink="/" class="flex items-center space-x-2">
+        <h1 class="text-2xl font-playfair font-bold tracking-tight">
+          ARSENIOR RENT
+        </h1>
+      </a>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a routerLink="/catalog" 
+           routerLinkActive="border-b-2 border-black"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Catálogo
+        </a>
+
+        @if (authService.isAuthenticated()) {
+          <a routerLink="/my-reservations" 
+             routerLinkActive="border-b-2 border-black"
+             class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+            Mis Reservas
+          </a>
+
+          @if (authService.isAdmin()) {
+            <a routerLink="/admin" 
+               routerLinkActive="border-b-2 border-black"
+               class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+              Dashboard
+            </a>
+          }
+
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-gray-600">
+              {{ authService.currentUser()?.firstName }}
+            </span>
+            <button (click)="logout()" 
+                    class="btn-secondary text-xs py-2 px-4">
+              Salir
+            </button>
+          </div>
+        } @else {
+          <a routerLink="/login" class="btn-ghost text-xs py-2 px-4">
+            Iniciar Sesión
+          </a>
+          <a routerLink="/register" class="btn-primary text-xs py-2 px-4">
+            Registrarse
+          </a>
+        }
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <button (click)="toggleMenu()" 
+              class="md:hidden flex flex-col space-y-1.5 p-2"
+              aria-label="Menu">
+        <span class="block w-6 h-0.5 bg-black transition-all"
+              [class.rotate-45]="menuOpen()"
+              [class.translate-y-2]="menuOpen()"></span>
+        <span class="block w-6 h-0.5 bg-black transition-all"
+              [class.opacity-0]="menuOpen()"></span>
+        <span class="block w-6 h-0.5 bg-black transition-all"
+              [class.-rotate-45]="menuOpen()"
+              [class.-translate-y-2]="menuOpen()"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  @if (menuOpen()) {
+    <div class="md:hidden absolute top-20 left-0 right-0 bg-white border-b border-gray-200 shadow-lg">
+      <div class="container-custom py-6 space-y-4">
+        <a (click)="navigateTo('/catalog')"
+           class="block text-sm uppercase tracking-wider hover:text-gray-600 transition-colors py-2 cursor-pointer">
+          Catálogo
+        </a>
+
+        @if (authService.isAuthenticated()) {
+          <a (click)="navigateTo('/my-reservations')"
+             class="block text-sm uppercase tracking-wider hover:text-gray-600 transition-colors py-2 cursor-pointer">
+            Mis Reservas
+          </a>
+
+          @if (authService.isAdmin()) {
+            <a (click)="navigateTo('/admin')"
+               class="block text-sm uppercase tracking-wider hover:text-gray-600 transition-colors py-2 cursor-pointer">
+              Dashboard
+            </a>
+          }
+
+          <div class="pt-4 border-t border-gray-200">
+            <p class="text-sm text-gray-600 mb-3">
+              {{ authService.currentUser()?.firstName }} {{ authService.currentUser()?.lastName }}
+            </p>
+            <button (click)="logout()" 
+                    class="btn-secondary w-full text-xs py-2">
+              Cerrar Sesión
+            </button>
+          </div>
+        } @else {
+          <a (click)="navigateTo('/login')"
+             class="block btn-ghost w-full text-center text-xs py-2 cursor-pointer">
+            Iniciar Sesión
+          </a>
+          <a (click)="navigateTo('/register')"
+             class="block btn-primary w-full text-center text-xs py-2 cursor-pointer">
+            Registrarse
+          </a>
+        }
+      </div>
+    </div>
+  }
+</nav>
+
+<!-- Spacer para el fixed navbar -->
+<div class="h-20"></div>

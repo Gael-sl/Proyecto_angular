@@ -1,0 +1,139 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-gray-50 section-padding">
+  <div class="container-custom">
+    <div class="max-w-4xl mx-auto">
+      
+      <h1 class="font-playfair text-center mb-8">Confirmar Reserva</h1>
+      <div class="divider"></div>
+
+      @if (checkoutData) {
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+          
+          <!-- Left: Summary -->
+          <div class="card">
+            <h3 class="font-playfair mb-6">Resumen de Reserva</h3>
+            
+            <!-- Car Info -->
+            <div class="mb-6">
+              <img [src]="checkoutData.car.image" [alt]="checkoutData.car.brand" class="w-full aspect-video object-cover mb-4" />
+              <h4 class="font-playfair">{{ checkoutData.car.brand }} {{ checkoutData.car.model }}</h4>
+              <p class="text-gray-600">{{ checkoutData.car.year }}</p>
+            </div>
+
+            <!-- Dates -->
+            <div class="space-y-2 mb-6 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Inicio:</span>
+                <span class="font-semibold">{{ checkoutData.startDate }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Devolución:</span>
+                <span class="font-semibold">{{ checkoutData.endDate }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total días:</span>
+                <span class="font-semibold">{{ checkoutData.totalDays }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Plan:</span>
+                <span class="font-semibold">{{ checkoutData.plan }}</span>
+              </div>
+            </div>
+
+            <!-- Extras -->
+            @if (checkoutData.extras.length > 0) {
+              <div class="mb-6">
+                <h5 class="font-semibold mb-3">Extras Seleccionados</h5>
+                @for (extra of checkoutData.extras; track extra.id) {
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">{{ extra.name }} (x{{ extra.quantity }})</span>
+                    <span>${{ (extra.price * extra.quantity).toFixed(2) }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Pricing -->
+            <div class="border-t border-gray-200 pt-4 space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Subtotal</span>
+                <span>${{ checkoutData.subtotal.toFixed(2) }}</span>
+              </div>
+              @if (checkoutData.extrasTotal > 0) {
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Extras</span>
+                  <span>${{ checkoutData.extrasTotal.toFixed(2) }}</span>
+                </div>
+              }
+              <div class="flex justify-between font-semibold text-lg pt-2 border-t border-gray-200">
+                <span>Total</span>
+                <span>${{ checkoutData.total.toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Payment -->
+          <div class="card">
+            <h3 class="font-playfair mb-6">Pago de Anticipo (30%)</h3>
+            
+            <div class="bg-gray-100 p-8 text-center mb-6">
+              <p class="text-3xl font-playfair mb-2">${{ (checkoutData.total * 0.3).toFixed(2) }}</p>
+              <p class="text-sm text-gray-600">A pagar ahora</p>
+            </div>
+
+            <!-- QR Code -->
+            @if (qrCodeUrl()) {
+              <div class="text-center mb-6">
+                <p class="text-sm text-gray-600 mb-4">Escanea el código QR para pagar</p>
+                <img [src]="qrCodeUrl()" alt="QR Code" class="mx-auto border-2 border-black" />
+              </div>
+            }
+
+            <!-- Info -->
+            <div class="bg-gray-50 p-4 mb-6 text-sm text-gray-600">
+              <p class="mb-2">📱 Escanea el código QR con tu app de pagos</p>
+              <p class="mb-2">💰 El resto (70%) se paga en agencia al recoger</p>
+              <p>✅ Recibirás confirmación por email</p>
+            </div>
+
+            <!-- Success Message -->
+            @if (success()) {
+              <div class="success-message mb-6">
+                ¡Reserva creada exitosamente! Redirigiendo...
+              </div>
+            }
+
+            <!-- Error Message -->
+            @if (error()) {
+              <div class="error-message mb-6">
+                {{ error() }}
+              </div>
+            }
+
+            <!-- Confirm Button -->
+            <button 
+              (click)="confirmReservation()"
+              class="btn-primary w-full"
+              [disabled]="loading() || success()"
+            >
+              @if (loading()) {
+                <span class="loading"></span>
+              } @else if (success()) {
+                Confirmado ✓
+              } @else {
+                Confirmar Reserva
+              }
+            </button>
+
+            <p class="text-xs text-center text-gray-500 mt-4">
+              Al confirmar aceptas nuestros términos y condiciones
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>

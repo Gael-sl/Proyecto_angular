@@ -1,0 +1,206 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <section class="bg-black text-white py-12">
+    <div class="container-custom">
+      <h1 class="font-playfair text-center mb-4">Panel de Administración</h1>
+      <div class="divider bg-white"></div>
+      <p class="text-center text-gray-300">Arsenior Rent - Control Total</p>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <section class="bg-white border-b border-gray-200">
+    <div class="container-custom">
+      <nav class="flex gap-6 overflow-x-auto py-4">
+        <a routerLink="/admin" routerLinkActive="border-b-2 border-black" 
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1 whitespace-nowrap">
+          Dashboard
+        </a>
+        <a routerLink="/admin/inventory" routerLinkActive="border-b-2 border-black"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1 whitespace-nowrap">
+          Inventario
+        </a>
+        <a routerLink="/admin/reservations" routerLinkActive="border-b-2 border-black"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1 whitespace-nowrap">
+          Reservas
+        </a>
+        <a routerLink="/admin/tracking" routerLinkActive="border-b-2 border-black"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1 whitespace-nowrap">
+          Tracking GPS
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="section-padding">
+    <div class="container-custom">
+      
+      @if (loading()) {
+        <app-loading-spinner [size]="300" message="Cargando estadísticas..."></app-loading-spinner>
+      }
+
+      @if (error()) {
+        <div class="error-message text-center">{{ error() }}</div>
+      }
+
+      @if (stats()) {
+        <!-- KPIs Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          
+          <!-- Total Revenue -->
+          <div class="card">
+            <p class="text-sm text-gray-600 mb-2">Ingresos Totales</p>
+            <p class="text-3xl font-playfair mb-2">{{ formatCurrency(stats()!.totalRevenue) }}</p>
+            <div class="flex items-center gap-2 text-sm" [ngClass]="getGrowthClass(stats()!.revenueGrowth)">
+              <span>{{ getGrowthIcon(stats()!.revenueGrowth) }} {{ Math.abs(stats()!.revenueGrowth).toFixed(1) }}%</span>
+              <span class="text-gray-600">vs mes anterior</span>
+            </div>
+          </div>
+
+          <!-- Total Reservations -->
+          <div class="card">
+            <p class="text-sm text-gray-600 mb-2">Reservas Totales</p>
+            <p class="text-3xl font-playfair mb-2">{{ stats()!.totalReservations }}</p>
+            <p class="text-sm text-gray-600">Todas las reservas</p>
+          </div>
+
+          <!-- Active Rentals -->
+          <div class="card border-black">
+            <p class="text-sm text-gray-600 mb-2">Rentas Activas</p>
+            <p class="text-3xl font-playfair mb-2">{{ stats()!.activeRentals }}</p>
+            <a routerLink="/admin/tracking" class="text-sm text-black underline">
+              Ver en mapa →
+            </a>
+          </div>
+
+          <!-- Available Vehicles -->
+          <div class="card">
+            <p class="text-sm text-gray-600 mb-2">Vehículos Disponibles</p>
+            <p class="text-3xl font-playfair mb-2">{{ stats()!.availableVehicles }}</p>
+            <p class="text-sm text-gray-600">{{ stats()!.vehiclesInMaintenance }} en mantenimiento</p>
+          </div>
+        </div>
+
+        <!-- Revenue Chart (Simplified) -->
+        <div class="card mb-12">
+          <h3 class="font-playfair mb-6">Ingresos por Mes</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            @for (month of stats()!.revenueByMonth; track month.month) {
+              <div class="text-center">
+                <div class="bg-black text-white py-8 mb-2">
+                  <p class="text-2xl font-playfair">{{ formatCurrency(month.revenue) }}</p>
+                </div>
+                <p class="text-sm text-gray-600">{{ month.month }}</p>
+                <p class="text-xs text-gray-500">{{ month.reservations }} reservas</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Segment Stats -->
+        <div class="card mb-12">
+          <h3 class="font-playfair mb-6">Distribución por Segmento</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @for (segment of stats()!.reservationsBySegment; track segment.segment) {
+              <div class="text-center">
+                <div class="aspect-square bg-gray-100 flex items-center justify-center mb-4">
+                  <div class="text-center">
+                    <p class="text-6xl font-playfair mb-2">{{ segment.percentage }}%</p>
+                    <p class="text-sm uppercase tracking-wider">
+                      Segmento {{ segment.segment }}
+                    </p>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-600">{{ segment.count }} reservas</p>
+                <p class="text-sm font-semibold">{{ formatCurrency(segment.revenue) }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Top Rated Cars -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div class="card">
+            <h3 class="font-playfair mb-6">Vehículos Mejor Calificados</h3>
+            <div class="space-y-4">
+              @for (car of stats()!.topRatedCars.slice(0, 5); track car.id) {
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <p class="font-semibold">{{ car.brand }} {{ car.model }}</p>
+                    <p class="text-sm text-gray-600">{{ car.totalRatings }} reseñas</p>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="text-xl">★</span>
+                    <span class="font-semibold">{{ car.rating.toFixed(1) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Top Users -->
+          <div class="card">
+            <h3 class="font-playfair mb-6">Usuarios Destacados</h3>
+            <div class="space-y-4">
+              @for (user of stats()!.topRatedUsers.slice(0, 5); track user.id) {
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <p class="font-semibold">{{ user.firstName }} {{ user.lastName }}</p>
+                    <p class="text-sm text-gray-600">{{ user.totalRentals }} rentas</p>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="text-xl">★</span>
+                    <span class="font-semibold">{{ user.rating.toFixed(1) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Reservations -->
+        <div class="card">
+          <h3 class="font-playfair mb-6">Reservas Recientes</h3>
+          <div class="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Vehículo</th>
+                  <th>Inicio</th>
+                  <th>Estado</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (reservation of stats()!.recentReservations.slice(0, 10); track reservation.id) {
+                  <tr>
+                    <td>#{{ reservation.id }}</td>
+                    <td>{{ reservation.user?.firstName }} {{ reservation.user?.lastName }}</td>
+                    <td>{{ reservation.car?.brand }} {{ reservation.car?.model }}</td>
+                    <td>{{ reservation.startDate }}</td>
+                    <td>
+                      <span class="badge" 
+                            [class.badge-success]="reservation.status === 'activa' || reservation.status === 'confirmada'"
+                            [class.badge-warning]="reservation.status === 'pendiente'">
+                        {{ reservation.status }}
+                      </span>
+                    </td>
+                    <td class="font-semibold">{{ formatCurrency(reservation.totalAmount) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>

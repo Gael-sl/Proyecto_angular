@@ -1,0 +1,88 @@
+<app-navbar></app-navbar>
+
+<main>
+  <!-- HERO SECTION -->
+  <section class="section-padding bg-white">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center fade-in">
+        <h1 class="font-playfair mb-6">
+          Experiencia Premium<br/>en Renta de Vehículos
+        </h1>
+        <div class="divider"></div>
+        <p class="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+          Descubre una nueva forma de vivir la movilidad. Elegancia, confort y tecnología en cada viaje.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a routerLink="/catalog" class="btn-primary">
+            Explorar Catálogo
+          </a>
+          <a routerLink="/register" class="btn-secondary">
+            Crear Cuenta
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section-padding bg-gray-50">
+    <div class="container-custom">
+      <div class="text-center mb-16">
+        <h2 class="font-playfair mb-4">Cómo Funciona</h2>
+        <div class="divider"></div>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Tres simples pasos para comenzar tu experiencia premium
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        @for (step of howItWorksSteps; track step.number) {
+          <div class="text-center fade-in">
+            <div class="font-playfair text-6xl mb-6 text-gray-200">
+              {{ step.number }}
+            </div>
+            <h3 class="font-playfair mb-4">{{ step.title }}</h3>
+            <p class="text-gray-600">{{ step.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section-padding bg-white">
+    <div class="container-custom">
+      <div class="text-center mb-16">
+        <h2 class="font-playfair mb-4">¿Por qué Arsenior Rent?</h2>
+        <div class="divider"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        @for (feature of features; track feature.title) {
+          <div class="card text-center">
+            <div class="text-5xl mb-4">{{ feature.icon }}</div>
+            <h4 class="font-playfair mb-3">{{ feature.title }}</h4>
+            <p class="text-sm text-gray-600">{{ feature.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="section-padding bg-black text-white">
+    <div class="container-custom text-center">
+      <h2 class="font-playfair text-white mb-6">
+        Comienza tu Experiencia Hoy
+      </h2>
+      <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
+        Únete a nuestra comunidad de conductores que confían en la excelencia
+      </p>
+      <a routerLink="/register" class="btn-secondary inline-block">
+        Registrarse Ahora
+      </a>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>

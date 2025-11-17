@@ -1,0 +1,79 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-gray-50 flex items-center justify-center py-16">
+  <div class="container-custom">
+    <div class="max-w-md mx-auto">
+      
+      <!-- Card -->
+      <div class="bg-white border-2 border-black p-12">
+        <h1 class="font-playfair text-4xl text-center mb-2">Iniciar Sesión</h1>
+        <div class="divider"></div>
+        <p class="text-center text-gray-600 mb-8">
+          Ingresa a tu cuenta Arsenior Rent
+        </p>
+
+        <!-- Error Message -->
+        @if (error) {
+          <div class="error-message mb-6">
+            {{ error }}
+          </div>
+        }
+
+        <!-- Form -->
+        <form (ngSubmit)="onSubmit()" class="space-y-6">
+          
+          <!-- Email -->
+          <div>
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="credentials.email"
+              placeholder="tu@email.com"
+              required
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password">Contraseña</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              [(ngModel)]="credentials.password"
+              placeholder="••••••••"
+              required
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="btn-primary w-full"
+            [disabled]="loading"
+          >
+            @if (loading) {
+              <span class="loading"></span>
+            } @else {
+              Iniciar Sesión
+            }
+          </button>
+        </form>
+
+        <!-- Register Link -->
+        <p class="text-center mt-8 text-gray-600">
+          ¿No tienes cuenta?
+          <a routerLink="/register" class="text-black underline font-semibold">
+            Regístrate aquí
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>

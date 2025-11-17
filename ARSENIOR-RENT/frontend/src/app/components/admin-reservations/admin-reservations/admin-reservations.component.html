@@ -1,0 +1,151 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <section class="bg-black text-white py-12">
+    <div class="container-custom">
+      <h1 class="font-playfair text-center mb-4">Gestión de Reservas</h1>
+      <div class="divider bg-white"></div>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <section class="bg-white border-b border-gray-200">
+    <div class="container-custom">
+      <nav class="flex gap-6 overflow-x-auto py-4">
+        <a routerLink="/admin"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Dashboard
+        </a>
+        <a routerLink="/admin/inventory"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Inventario
+        </a>
+        <a routerLink="/admin/reservations" routerLinkActive="border-b-2 border-black"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Reservas
+        </a>
+        <a routerLink="/admin/tracking"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Tracking GPS
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="section-padding">
+    <div class="container-custom">
+      
+      @if (loading()) {
+        <app-loading-spinner [size]="300" message="Cargando reservas..."></app-loading-spinner>
+      }
+
+      @if (error()) {
+        <div class="error-message">{{ error() }}</div>
+      }
+
+      <!-- Reservations Table -->
+      <div class="card overflow-x-auto">
+        <h2 class="font-playfair mb-6">Todas las Reservas ({{ reservations().length }})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Vehículo</th>
+              <th>Inicio - Fin</th>
+              <th>Plan</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (reservation of reservations(); track reservation.id) {
+              <tr>
+                <td>#{{ reservation.id }}</td>
+                <td>{{ reservation.user?.firstName }} {{ reservation.user?.lastName }}</td>
+                <td>{{ reservation.car?.brand }} {{ reservation.car?.model }}</td>
+                <td class="text-sm">
+                  {{ reservation.startDate }}<br/>{{ reservation.endDate }}
+                </td>
+                <td>{{ reservation.plan }}</td>
+                <td class="font-semibold">${{ reservation.totalAmount.toFixed(2) }}</td>
+                <td>
+                  <span class="badge"
+                        [class.badge-success]="reservation.status === 'activa' || reservation.status === 'confirmada'"
+                        [class.badge-warning]="reservation.status === 'pendiente'">
+                    {{ reservation.status }}
+                  </span>
+                </td>
+                <td>
+                  <div class="flex flex-col gap-2">
+                    @if (reservation.status === 'activa') {
+                      <button (click)="markAsReturned(reservation)" class="btn-primary text-xs py-1 px-2">
+                        Marcar Devuelto
+                      </button>
+                    }
+                    @if (reservation.status === 'completada' && reservation.returnChecklist) {
+                      <button (click)="openRatingModal(reservation)" class="btn-secondary text-xs py-1 px-2">
+                        Calificar Usuario
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Rating Modal -->
+@if (showRatingModal()) {
+  <div class="overlay" (click)="closeRatingModal()">
+    <div class="modal p-8 max-w-md" (click)="$event.stopPropagation()">
+      <h2 class="font-playfair mb-6">Calificar Usuario</h2>
+      
+      <div class="space-y-4 mb-6">
+        <div>
+          <label>Estado de Devolución del Vehículo</label>
+          <input type="range" min="1" max="5" [(ngModel)]="adminRating.vehicleReturnCondition" class="w-full" />
+          <p class="text-sm text-center">{{ adminRating.vehicleReturnCondition }} / 5</p>
+        </div>
+
+        <div>
+          <label>Puntualidad</label>
+          <input type="range" min="1" max="5" [(ngModel)]="adminRating.punctuality" class="w-full" />
+          <p class="text-sm text-center">{{ adminRating.punctuality }} / 5</p>
+        </div>
+
+        <div>
+          <label>Comunicación</label>
+          <input type="range" min="1" max="5" [(ngModel)]="adminRating.communication" class="w-full" />
+          <p class="text-sm text-center">{{ adminRating.communication }} / 5</p>
+        </div>
+
+        <div>
+          <label>Uso Responsable</label>
+          <input type="range" min="1" max="5" [(ngModel)]="adminRating.responsibleUse" class="w-full" />
+          <p class="text-sm text-center">{{ adminRating.responsibleUse }} / 5</p>
+        </div>
+
+        <div>
+          <label>Comentarios</label>
+          <textarea [(ngModel)]="adminRating.comments" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <button (click)="closeRatingModal()" class="btn-secondary flex-1">Cancelar</button>
+        <button (click)="submitRating()" class="btn-primary flex-1">Enviar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-footer></app-footer>

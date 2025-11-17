@@ -1,0 +1,98 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <section class="bg-black text-white py-12">
+    <div class="container-custom">
+      <h1 class="font-playfair text-center mb-4">Tracking GPS en Tiempo Real</h1>
+      <div class="divider bg-white"></div>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <section class="bg-white border-b border-gray-200">
+    <div class="container-custom">
+      <nav class="flex gap-6 overflow-x-auto py-4">
+        <a routerLink="/admin"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Dashboard
+        </a>
+        <a routerLink="/admin/inventory"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Inventario
+        </a>
+        <a routerLink="/admin/reservations"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Reservas
+        </a>
+        <a routerLink="/admin/tracking" routerLinkActive="border-b-2 border-black"
+           class="text-sm uppercase tracking-wider hover:text-gray-600 transition-colors pb-1">
+          Tracking GPS
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="section-padding">
+    <div class="container-custom">
+      
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="font-playfair">Rentas Activas con GPS ({{ activeRentals().length }})</h2>
+        <button (click)="refreshData()" class="btn-primary">
+          Actualizar Datos
+        </button>
+      </div>
+
+      @if (loading()) {
+        <app-loading-spinner [size]="300" message="Cargando ubicaciones..."></app-loading-spinner>
+      }
+
+      @if (error()) {
+        <div class="error-message">{{ error() }}</div>
+      }
+
+      <!-- Map -->
+      <div class="card mb-8 p-0 overflow-hidden">
+        <div id="map" class="w-full h-[600px]"></div>
+      </div>
+
+      <!-- Active Rentals List -->
+      <div class="card">
+        <h3 class="font-playfair mb-6">Lista de Vehículos</h3>
+        <div class="space-y-4">
+          @for (rental of activeRentals(); track rental.reservation.id) {
+            <div class="border border-gray-200 p-4 flex justify-between items-center">
+              <div class="flex-1">
+                <h4 class="font-semibold">{{ rental.car.brand }} {{ rental.car.model }}</h4>
+                <p class="text-sm text-gray-600">{{ rental.user.firstName }} {{ rental.user.lastName }}</p>
+                <p class="text-sm text-gray-600">Reserva #{{ rental.reservation.id }}</p>
+              </div>
+              @if (rental.currentLocation) {
+                <div class="text-right text-sm">
+                  <p class="text-gray-600">Ubicación:</p>
+                  <p class="font-mono text-xs">
+                    {{ rental.currentLocation.latitude.toFixed(6) }}, 
+                    {{ rental.currentLocation.longitude.toFixed(6) }}
+                  </p>
+                    <p class="text-xs text-gray-500">
+                    {{ formatTimestamp(rental.currentLocation.timestamp) }}
+                  </p>
+                </div>
+              } @else {
+                <p class="text-sm text-gray-500">Sin ubicación GPS</p>
+              }
+            </div>
+          }
+
+          @if (activeRentals().length === 0) {
+            <p class="text-center text-gray-600 py-8">No hay rentas activas en este momento</p>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>
