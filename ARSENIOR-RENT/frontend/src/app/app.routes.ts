@@ -73,6 +73,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/admin-tracking/admin-tracking/admin-tracking.component').then(m => m.AdminTrackingComponent),
     canActivate: [AuthGuard, AdminGuard]
   },
+  {
+    path: 'admin/maintenance',
+    loadComponent: () => import('./components/admin-maintenance/admin-maintenance/admin-maintenance.component').then(m => m.AdminMaintenanceComponent),
+    canActivate: [AuthGuard, AdminGuard]
+  },
 
   // Ruta 404
   {
