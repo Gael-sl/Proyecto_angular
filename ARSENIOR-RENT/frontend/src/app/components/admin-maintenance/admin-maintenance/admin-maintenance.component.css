@@ -1,0 +1,155 @@
+/* Admin Maintenance Styles */
+
+/* Badge Styles */
+.badge {
+  @apply px-3 py-1 text-xs uppercase tracking-wider font-medium;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-info {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* Card Enhancements */
+.card {
+  @apply transition-all duration-300;
+}
+
+.card:hover {
+  @apply shadow-lg;
+}
+
+/* Table Styles */
+table {
+  @apply w-full;
+}
+
+table th {
+  @apply text-left font-medium text-gray-700 uppercase tracking-wider text-xs;
+}
+
+table td {
+  @apply text-gray-900;
+}
+
+/* Modal Overlay */
+.fixed.inset-0 {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content */
+.bg-white.max-w-4xl {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Button Hover Effects */
+button {
+  @apply transition-all duration-200;
+}
+
+button:hover {
+  @apply shadow-md;
+}
+
+button:active {
+  @apply transform scale-95;
+}
+
+/* Input Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+  @apply ring-2 ring-black ring-opacity-20;
+}
+
+/* Scrollbar Styling for Modal */
+.max-h-\[90vh\]::-webkit-scrollbar {
+  width: 8px;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Status Border Indicators */
+.border-yellow-500 {
+  border-left-width: 4px;
+}
+
+.border-green-600 {
+  border-left-width: 4px;
+}
+
+.border-blue-500 {
+  border-left-width: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    font-size: 0.875rem;
+  }
+
+  .grid.grid-cols-2.md\:grid-cols-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Loading state for buttons */
+button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Item row hover effect */
+.grid.grid-cols-12.gap-3.items-start.p-4 {
+  @apply transition-all duration-200;
+}
+
+.grid.grid-cols-12.gap-3.items-start.p-4:hover {
+  @apply bg-gray-100;
+}
+
+/* Error message styling */
+.error-message {
+  @apply bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded;
+}
