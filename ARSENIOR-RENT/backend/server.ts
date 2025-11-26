@@ -11,6 +11,7 @@ import checklistsRoutes from './routes/checklists';
 import ratingsRoutes from './routes/ratings';
 import trackingRoutes from './routes/tracking';
 import adminRoutes from './routes/admin';
+import maintenanceRoutes from './routes/maintenance';
 
 dotenv.config();
 
@@ -46,7 +47,8 @@ app.get('/api/health', (req: Request, res: Response) => {
       checklists: '/api/checklists',
       ratings: '/api/ratings',
       tracking: '/api/tracking',
-      admin: '/api/admin'
+      admin: '/api/admin',
+      maintenance: '/api/maintenance'
     }
   });
 });
@@ -59,6 +61,7 @@ app.use('/api/checklists', checklistsRoutes);
 app.use('/api/ratings', ratingsRoutes);
 app.use('/api/tracking', trackingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req: Request, res: Response) => {
@@ -96,7 +99,8 @@ app.listen(PORT, () => {
 ║   ├─ /api/checklists    (Listas de Cotejo)    ║
 ║   ├─ /api/ratings       (Calificaciones)      ║
 ║   ├─ /api/tracking      (GPS Tracking)        ║
-║   └─ /api/admin         (Panel Admin)         ║
+║   ├─ /api/admin         (Panel Admin)         ║
+║   └─ /api/maintenance   (Mantenimiento)       ║
 ║                                                ║
 ║   🔐 Usuarios de prueba:                       ║
 ║   Admin: admin@arseniorrent.com / admin123    ║

@@ -167,6 +167,37 @@ export const initDatabase = (): void => {
     )
   `);
 
+  // TABLA: Maintenances
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS maintenances (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      carId INTEGER NOT NULL,
+      types TEXT NOT NULL,
+      mechanic TEXT NOT NULL,
+      startDate TEXT NOT NULL,
+      endDate TEXT,
+      status TEXT DEFAULT 'programado' CHECK(status IN ('programado', 'en_proceso', 'completado')),
+      totalCost REAL NOT NULL,
+      notes TEXT,
+      createdAt TEXT DEFAULT (datetime('now')),
+      updatedAt TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (carId) REFERENCES cars(id) ON DELETE CASCADE
+    )
+  `);
+
+  // TABLA: Maintenance Items
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS maintenance_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      maintenanceId INTEGER NOT NULL,
+      category TEXT NOT NULL,
+      description TEXT NOT NULL,
+      cost REAL NOT NULL,
+      createdAt TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (maintenanceId) REFERENCES maintenances(id) ON DELETE CASCADE
+    )
+  `);
+
   console.log('✅ Base de datos inicializada correctamente');
 };
 
